@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UserUpdateRequest;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -12,22 +13,22 @@ class UserController extends Controller
 {
     public function index()
     {
-        return User::paginate();
+        return UserResource::collection(User::paginate());
     }
 
     public function store(Request $request)
     {
         $user = User::create(
-            $request->only('first_name', 'last_name', 'email')
+            $request->only('first_name', 'last_name', 'email', 'role_id')
             + ['password' => Hash::make(1234)]
         );
 
-        return response($user, Response::HTTP_CREATED);
+        return response(new UserResource($user), Response::HTTP_CREATED);
     }
 
     public function show(string $id)
     {
-        return User::with('role')->find($id);
+        return new UserResource(User::with('role')->find($id));
     }
 
     public function update(UserUpdateRequest $request, string $id)
@@ -36,7 +37,7 @@ class UserController extends Controller
 
         $user->update($request->only('first_name', 'last_name', 'email'));
 
-        return response($user, Response::HTTP_ACCEPTED);
+        return response(new UserResource($user), Response::HTTP_ACCEPTED);
     }
 
     public function destroy(string $id)
