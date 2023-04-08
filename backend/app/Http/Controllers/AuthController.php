@@ -14,7 +14,8 @@ use Illuminate\Support\Facades\Cookie;
 
 class AuthController extends Controller
 {
-    public function register(RegisterRequest $request) {
+    public function register(RegisterRequest $request)
+    {
         $user = User::create([
             'first_name' => $request->input('first_name'),
             'last_name' => $request->input('last_name'),
@@ -26,10 +27,11 @@ class AuthController extends Controller
         return response(new UserResource($user), Response::HTTP_CREATED);
     }
 
-    public function login(Request $request) {
+    public function login(Request $request)
+    {
         if (!Auth::attempt($request->only('email', 'password'))) {
-            return response([
-                'error' => 'Invalid Credentials'
+            return \response([
+                'error' => 'Invalid credentials!'
             ], Response::HTTP_UNAUTHORIZED);
         }
 
@@ -39,40 +41,45 @@ class AuthController extends Controller
         $jwt = $user->createToken('token')->plainTextToken;
 
         $cookie = cookie('jwt', $jwt, 60 * 24);
-        return response([
+
+        return \response([
             'jwt' => $jwt
         ])->withCookie($cookie);
     }
 
-    public function logout() {
+    public function user(Request $request)
+    {
+        $user = $request->user();
+        
+        return new UserResource($user->load('role'));
+    }
+
+    public function logout()
+    {
         $cookie = Cookie::forget('jwt');
 
-        return response([
+        return \response([
             'message' => 'success'
         ])->withCookie($cookie);
     }
 
-    public function user(Request $request) {
-        $user = $request->user();
-
-        return new UserResource($user->load('role'));
-    }
-
-    public function updateInfo(UpdateInfoRequest $request) {
+    public function updateInfo(UpdateInfoRequest $request)
+    {
         $user = $request->user();
 
         $user->update($request->only('first_name', 'last_name', 'email'));
 
-        return response(new UserResource($user), Response::HTTP_ACCEPTED);
+        return \response(new UserResource($user), Response::HTTP_ACCEPTED);
     }
 
-    public function updatePassword(UpdatePasswordRequest $request) {
+    public function updatePassword(UpdatePasswordRequest $request)
+    {
         $user = $request->user();
 
         $user->update([
             'password' => Hash::make($request->input('password'))
         ]);
 
-        return response(new UserResource($user), Response::HTTP_ACCEPTED);
+        return \response(new UserResource($user), Response::HTTP_ACCEPTED);
     }
 }

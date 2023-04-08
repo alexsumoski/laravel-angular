@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { NavigationComponent } from './navigation/navigation.component';
 import { MenuComponent } from './menu/menu.component';
 import { SecureComponent } from './secure.component';
+import { RouterModule } from '@angular/router';
 
 
 @NgModule({
@@ -11,8 +12,12 @@ import { SecureComponent } from './secure.component';
     MenuComponent,
     SecureComponent
   ],
+  exports: [
+    SecureComponent
+  ],
   imports: [
-    CommonModule
+    CommonModule,
+    RouterModule
   ]
 })
 export class SecureModule { }

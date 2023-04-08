@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UserUpdateRequest;
+use App\Http\Requests\UserCreateRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
@@ -19,7 +20,7 @@ class UserController extends Controller
         return UserResource::collection(User::paginate());
     }
 
-    public function store(Request $request)
+    public function store(UserCreateRequest $request)
     {
         $this->authorize('edit','users');
 
